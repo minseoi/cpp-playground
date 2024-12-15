@@ -3,21 +3,26 @@
 
 using PACKET_INDEX = unsigned int;
 
-#define PACKET_USE_ITEM_REQ_INDEX 1000
-#define PACKET_USE_ITEM_ACK_INDEX 1001
+enum class PacketIndex : PACKET_INDEX
+{
+    USE_ITEM_REQ = 1000,
+    USE_ITEM_ACK = 1001,
+    SET_TARGET_REQ = 1010,
+    SET_TARGET_ACK = 1011
+};
 
 class PacketBase
 {
-    PACKET_INDEX m_index {};
+    PacketIndex m_index {};
 
 public:
-    explicit PacketBase(PACKET_INDEX _packetIndex) :
+    explicit PacketBase(PacketIndex _packetIndex) :
         m_index(_packetIndex)
     {
     }
     explicit PacketBase() = delete;
     virtual ~PacketBase() = default;
-    [[nodiscard]] PACKET_INDEX GetIndex() const
+    [[nodiscard]] PacketIndex GetIndex() const
     {
         return m_index;
     }
@@ -31,7 +36,7 @@ class PACKET_USE_ITEM_ACK final : public PacketBase
 {
 public:
     PACKET_USE_ITEM_ACK() :
-    PacketBase(PACKET_USE_ITEM_ACK_INDEX)
+    PacketBase(PacketIndex::USE_ITEM_ACK)
     {
     }
 };
@@ -39,7 +44,7 @@ class PACKET_USE_ITEM_REQ final : public PacketBase
 {
 public:
     PACKET_USE_ITEM_REQ() :
-    PacketBase(PACKET_USE_ITEM_REQ_INDEX)
+    PacketBase(PacketIndex::USE_ITEM_REQ)
     {
     }
 
@@ -57,81 +62,160 @@ public:
     explicit PacketSendFilterBase() = default;
     virtual ~PacketSendFilterBase() = default;
 
-    virtual bool TrySend() = 0;
-    virtual void OnRecv() = 0;
+    virtual bool operator()(bool _isRecv) = 0;
 };
 
 class PacketSendFilter_DoOnce final : public PacketSendFilterBase
 {
 private:
-    bool bSnet;
+    bool m_allow {};
 
 public:
     explicit PacketSendFilter_DoOnce() :
-        PacketSendFilterBase(),
-        bSnet(false)
+        PacketSendFilterBase()
     {
     }
 
-    bool TrySend() override
+    bool operator() (bool _isRecv) override
     {
-        if (bSnet)
+        if (!_isRecv)
         {
-            LOG_I("Block");
-            return false;
+            if (m_allow)
+            {
+                LOG_I("Block");
+                return false;
+            }
+
+            m_allow = true;
+            LOG_I("Allow");
+            return true;
         }
 
-        bSnet = true;
-        LOG_I("Allow");
+        LOG_I("Free");
+        m_allow = false;
         return true;
-    }
-
-    void OnRecv() override
-    {
-        bSnet = false;
     }
 };
 
+class PacketSendFilter_Cooldown final : public PacketSendFilterBase
+{
+private:
+    std::time_t m_lastSendTime {};
+    const std::time_t m_cooldown {};
+
+public:
+    explicit PacketSendFilter_Cooldown(std::time_t _cooldown) :
+        PacketSendFilterBase(),
+        m_cooldown(_cooldown)
+    {
+    }
+
+    bool operator()(bool _isRecv) override
+    {
+        if (!_isRecv)
+        {
+            const std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+            const std::time_t elpasedTime = now - m_lastSendTime;
+            if (elpasedTime < m_cooldown)
+            {
+                LOG_I("Block");
+                return false;
+            }
+
+            m_lastSendTime = now;
+            LOG_I("Allow");
+            return true;
+        }
+
+        return true;
+    }
+};
+
+#define REGISTER_SEND_FILTER(REQ_INDEX, ACK_INDEX, FILTER_TYPE, ...) \
+ADD_PACKET_PAIR_MAP(REQ_INDEX, ACK_INDEX) \
+ADD_FILTER(REQ_INDEX, FILTER_TYPE, __VA_ARGS__)
+
+#define ADD_PACKET_PAIR_MAP(REQ_INDEX, ACK_INDEX) \
+m_packetPairMap.emplace(ACK_INDEX, REQ_INDEX);
+
+#define ADD_FILTER(REQ_INDEX, FILTER_TYPE, ...) \
+m_filterMap.emplace(REQ_INDEX, std::make_shared<FILTER_TYPE>(__VA_ARGS__))
 
 class PakcetSendFilterManager
 {
 private:
-    std::unordered_map<PACKET_INDEX, std::shared_ptr<PacketSendFilterBase>> m_filterMap;
+    std::unordered_map<PacketIndex, std::shared_ptr<PacketSendFilterBase>> m_filterMap {};
+    std::unordered_map<PacketIndex, PacketIndex> m_packetPairMap {};
 
 public:
     explicit PakcetSendFilterManager()
     {
         m_filterMap.clear();
-        m_filterMap.emplace(PACKET_USE_ITEM_REQ_INDEX, std::make_shared<PacketSendFilter_DoOnce>());
+        m_packetPairMap.clear();
+
+        REGISTER_SEND_FILTER(PacketIndex::USE_ITEM_REQ, PacketIndex::USE_ITEM_ACK, PacketSendFilter_DoOnce);
+        REGISTER_SEND_FILTER(PacketIndex::SET_TARGET_REQ, PacketIndex::SET_TARGET_ACK, PacketSendFilter_Cooldown, 1.0f);
     }
 
-    bool CheckCanSend(const std::shared_ptr<PacketBase>& _packet)
+    bool CheckCanSend(const std::shared_ptr<PacketBase>& _reqPacket)
     {
-        if (const std::shared_ptr<PacketSendFilterBase>& Filter = GetFiler(_packet))
+        if (_reqPacket == nullptr)
         {
-            return Filter->TrySend();
+            return false;
+        }
+
+        if (const std::shared_ptr<PacketSendFilterBase>& Filter = GetFilter(_reqPacket))
+        {
+            return (*Filter)(false);
         }
         return true;
     }
 
-    void OnRecv(const std::shared_ptr<PacketBase>& _packet)
+    void OnRecv(const std::shared_ptr<PacketBase>& _ackPacket)
     {
-        if (const std::shared_ptr<PacketSendFilterBase>& Filter = GetFiler(_packet))
+        if (_ackPacket == nullptr)
         {
-            return Filter->OnRecv();
+            return;
+        }
+
+        const std::optional<PacketIndex> reqIndex = GetReqFromAck(_ackPacket->GetIndex());
+        if (!reqIndex.has_value())
+        {
+            return;
+        }
+
+        if (const std::shared_ptr<PacketSendFilterBase>& Filter = GetFilter(reqIndex.value()))
+        {
+            (*Filter)(true);
         }
     }
 
 private:
-    std::shared_ptr<PacketSendFilterBase> GetFiler(const std::shared_ptr<PacketBase>& _packet)
+    std::shared_ptr<PacketSendFilterBase> GetFilter(const std::shared_ptr<PacketBase>& _reqPacket)
     {
-        if (_packet == nullptr)
+        if (_reqPacket == nullptr)
         {
             return {};
         }
 
-        const auto iter = m_filterMap.find(_packet->GetIndex());
+        return GetFilter(_reqPacket->GetIndex());
+    }
+
+    std::shared_ptr<PacketSendFilterBase> GetFilter(const PacketIndex& _reqIndex)
+    {
+        const auto iter = m_filterMap.find(_reqIndex);
         if (iter == m_filterMap.end())
+        {
+            return {};
+        }
+
+        return iter->second;
+    }
+
+    std::optional<PacketIndex> GetReqFromAck(PacketIndex _ackIndex)
+    {
+        const auto iter = m_packetPairMap.find(_ackIndex);
+        if (iter == m_packetPairMap.end())
         {
             return {};
         }
