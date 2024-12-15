@@ -6,13 +6,13 @@
 #include "Network/NetworkDefinition.h"
 
 
-class PakcetSendFilterManager
+class PacketSendFilterManager
 {
 private:
     //std::unordered_map<PACKET_INDEX, PacketLimiterBase> m_limiterMap;
 
 public:
-    explicit PakcetSendFilterManager()
+    explicit PacketSendFilterManager()
     {
 
     }

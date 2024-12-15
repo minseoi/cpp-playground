@@ -1,9 +1,8 @@
 #include <iostream>
 #include "Log/LogDefinition.h"
 
-using PACKET_INDEX = unsigned int;
 
-enum class PacketIndex : PACKET_INDEX
+enum class PacketIndex : unsigned int
 {
     USE_ITEM_REQ = 1000,
     USE_ITEM_ACK = 1001,
@@ -141,18 +140,15 @@ m_packetPairMap.emplace(ACK_INDEX, REQ_INDEX);
 #define ADD_FILTER(REQ_INDEX, FILTER_TYPE, ...) \
 m_filterMap.emplace(REQ_INDEX, std::make_shared<FILTER_TYPE>(__VA_ARGS__))
 
-class PakcetSendFilterManager
+class PacketSendFilterManager
 {
 private:
     std::unordered_map<PacketIndex, std::shared_ptr<PacketSendFilterBase>> m_filterMap {};
     std::unordered_map<PacketIndex, PacketIndex> m_packetPairMap {};
 
 public:
-    explicit PakcetSendFilterManager()
+    explicit PacketSendFilterManager()
     {
-        m_filterMap.clear();
-        m_packetPairMap.clear();
-
         REGISTER_SEND_FILTER(PacketIndex::USE_ITEM_REQ, PacketIndex::USE_ITEM_ACK, PacketSendFilter_DoOnce);
         REGISTER_SEND_FILTER(PacketIndex::SET_TARGET_REQ, PacketIndex::SET_TARGET_ACK, PacketSendFilter_Cooldown, 1.0f);
     }
@@ -226,7 +222,7 @@ private:
 
 // ****************************************************************************** //
 
-PakcetSendFilterManager SendFilerManager;
+PacketSendFilterManager SendFilerManager;
 
 void Send(const std::shared_ptr<PacketBase>& _packet)
 {
