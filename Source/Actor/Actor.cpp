@@ -3,12 +3,17 @@
 #include "Actor.h"
 #include "Math/Vector.hpp"
 
-Actor::Actor(const Vector &_m_location) :
-    m_location(_m_location)
+Actor::Actor() :
+    m_location(Vector::ZeroVector)
 {
 }
 
 Vector Actor::GetActorLocation() const
 {
     return m_location;
+}
+
+void Actor::SetActorLocation(const Vector &location)
+{
+    m_location = location;
 }

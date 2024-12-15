@@ -12,7 +12,9 @@ class Actor : std::enable_shared_from_this<Actor>
     Vector m_location;
 
 public:
-    explicit Actor(const Vector &_m_location);
+    explicit Actor();
+    virtual ~Actor() = default;
 
     Vector GetActorLocation() const;
+    void SetActorLocation(const Vector& location);
 };

@@ -13,4 +13,13 @@ add_executable(
         Math/Vector.hpp
         Math/Math.cpp
         Math/Math.h
+        Network/Packet/PacketBase.cpp
+        Network/Packet/PacketBase.h
+        Network/NetworkDefinition.h
+        Network/SendFilter/Filter/PacketSendFilterBase.h
+        Network/SendFilter/Filter/PacketSendFilter_DoOnce.cpp
+        Network/SendFilter/Filter/PacketSendFilter_DoOnce.h
+        Network/SendFilter/PakcetSendFilterManager.cpp
+        Network/SendFilter/PakcetSendFilterManager.h
+        Log/LogDefinition.h
 )
