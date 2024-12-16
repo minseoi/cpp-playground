@@ -13,9 +13,9 @@ private:
     const std::chrono::milliseconds m_cooldown {};
 
 public:
-    explicit PacketSendFilterCooldown(const std::chrono::milliseconds _cooldown) :
+    explicit PacketSendFilterCooldown(const uint _cooldown) :
         PacketSendFilterBase(),
-        m_cooldown(_cooldown)
+        m_cooldown(std::chrono::milliseconds(_cooldown))
     {
     }
 

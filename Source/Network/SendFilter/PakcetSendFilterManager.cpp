@@ -4,6 +4,8 @@
 
 #include "Network/Packet/PacketBase.hpp"
 #include "Filter/PacketSendFilterBase.h"
+#include "Filter/PacketSendFilterCooldown.h"
+#include "Filter/PacketSendFilterDoOnce.h"
 
 PacketSendFilterManager::PacketSendFilterManager()
 {
