@@ -3,7 +3,7 @@
 #pragma once
 
 
-class PacketSendFilter_DoOnce
+class PacketSendFilterDoOnce
 {
 
 };
