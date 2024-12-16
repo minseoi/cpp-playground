@@ -5,8 +5,9 @@
 
 class PacketSendFilterBase
 {
+public:
+    explicit PacketSendFilterBase() = default;
     virtual ~PacketSendFilterBase() = default;
 
-    virtual void OnSend() = 0;
-    virtual void OnRecv() = 0;
+    virtual bool operator()(const bool isRecv) = 0;
 };

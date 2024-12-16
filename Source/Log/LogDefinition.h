@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <cstdio>
+
 #define LOG(level, format, ...) \
 std::printf("[%s] (%s/%d) " format "\n", level, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 

@@ -13,8 +13,7 @@ add_executable(
         Math/Vector.hpp
         Math/Math.cpp
         Math/Math.h
-        Network/Packet/PacketBase.cpp
-        Network/Packet/PacketBase.h
+        Network/Packet/PacketBase.hpp
         Network/NetworkDefinition.h
         Network/SendFilter/Filter/PacketSendFilterBase.h
         Network/SendFilter/Filter/PacketSendFilterDoOnce.cpp
@@ -22,4 +21,7 @@ add_executable(
         Network/SendFilter/PakcetSendFilterManager.cpp
         Network/SendFilter/PakcetSendFilterManager.h
         Log/LogDefinition.h
+        Network/Packet/PacketDefinition.h
+        Network/SendFilter/Filter/PacketSendFilterCooldown.cpp
+        Network/SendFilter/Filter/PacketSendFilterCooldown.h
 )
