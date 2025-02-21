@@ -24,4 +24,21 @@ add_executable(
         Network/SendFilter/PakcetSendFilterManager.h
         Log/LogDefinition.h
         Network/Packet/PacketDefinition.h
+
+        Engine/Definition/TypeDefinition.h
+        Engine/Runtime/Core/CoreGlobals.cpp
+        Engine/Runtime/Core/CoreGlobals.h
+        Engine/Runtime/Launch/EngineLoop.cpp
+        Engine/Runtime/Launch/EngineLoop.h
+        Engine/Runtime/Launch/Launch.cpp
+        Engine/Runtime/Engine/Engine.cpp
+        Engine/Runtime/Engine/Engine.h
+        Engine/Runtime/Core/Logging/LogMacros.h
+        Engine/Runtime/World/World.cpp
+        Engine/Runtime/World/World.h
+        Engine/Runtime/Core/GenericPlatform/GenericPlatformTime.cpp
+        Engine/Runtime/Core/GenericPlatform/GenericPlatformTime.h
+        Engine/Runtime/Core/Misc/App.cpp
+        Engine/Runtime/Core/Misc/App.h
+        Engine/Runtime/Launch/Launch.h
 )
