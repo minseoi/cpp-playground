@@ -5,16 +5,17 @@
 #include <string>
 #include <vector>
 #include "Engine/Runtime/Core/Logging/LogMacros.h"
-#include "Engine/Runtime/World/World.h"
+#include "Engine/Runtime/Engine/Classes/World/World.h"
 #include "Engine/Runtime/Core/Misc/App.h"
 
 
+class GameInstance;
 class EngineLoop;
 
 struct WorldContext
 {
-private:
     std::shared_ptr<World> currentWorld;
+    std::weak_ptr<GameInstance> owningGameInstance;
 
 public:
     explicit WorldContext() :
@@ -39,13 +40,15 @@ public:
     EngineLoop* EngineLoopPtr;
 
 protected:
-    std::vector<std::shared_ptr<WorldContext>> WorldList;
+    std::vector<std::shared_ptr<WorldContext>> m_worldList;
+    std::shared_ptr<GameInstance> m_gameInstance;
 
 public:
     void Init(EngineLoop* InLoop);
     void Start();
     void Tick(float DeltaSeconds, bool bIdleMode);
 
+    void LoadConfig();
     double CorrectNegativeTimeDelta(double DeltaRealTime);
     void UpdateTimeAndHandleMaxTickRate();
 

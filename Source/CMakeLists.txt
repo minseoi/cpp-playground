@@ -34,11 +34,13 @@ add_executable(
         Engine/Runtime/Engine/Engine.cpp
         Engine/Runtime/Engine/Engine.h
         Engine/Runtime/Core/Logging/LogMacros.h
-        Engine/Runtime/World/World.cpp
-        Engine/Runtime/World/World.h
+        Engine/Runtime/Engine/Classes/World/World.cpp
+        Engine/Runtime/Engine/Classes/World/World.h
         Engine/Runtime/Core/GenericPlatform/GenericPlatformTime.cpp
         Engine/Runtime/Core/GenericPlatform/GenericPlatformTime.h
         Engine/Runtime/Core/Misc/App.cpp
         Engine/Runtime/Core/Misc/App.h
         Engine/Runtime/Launch/Launch.h
+        Engine/Runtime/Engine/Classes/GameInstance.cpp
+        Engine/Runtime/Engine/Classes/GameInstance.h
 )

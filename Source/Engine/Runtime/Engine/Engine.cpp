@@ -4,6 +4,7 @@
 
 #include <thread>
 
+#include "Classes/GameInstance.h"
 #include "Engine/Runtime/Core/GenericPlatform/GenericPlatformTime.h"
 #include "Engine/Runtime/Launch/EngineLoop.h"
 
@@ -13,18 +14,42 @@ void Engine::Init(EngineLoop* InLoop)
 {
     EngineLoopPtr = InLoop;
 
-    WorldContext &InitialWorldContext = CreateNewWorldContext();
-    InitialWorldContext.SetCurrentWorld(World::CreateWorld());
+    LoadConfig();
+    LoadConfig();
+
+    // WorldContext &InitialWorldContext = CreateNewWorldContext();
+    // InitialWorldContext.SetCurrentWorld(World::CreateWorld());
+
+    m_gameInstance = std::make_shared<GameInstance>();
+    m_gameInstance->InitializeStandalone();
 }
 
 void Engine::Start()
 {
-    //todo: Start Game Instance
+    LOG_I("Starting Game");
+    m_gameInstance->StartGameInstnace();
 }
 
 void Engine::Tick(float DeltaSeconds, bool bIdleMode)
 {
-    LOG_D("Engine is ticking (%f)", DeltaSeconds);
+    for (int32 WorldIdx = 0; WorldIdx < m_worldList.size(); ++WorldIdx)
+    {
+        std::shared_ptr<WorldContext>& Context = m_worldList[WorldIdx];
+        if (Context == nullptr || Context->World() == nullptr || !Context->World()->ShouldTick())
+        {
+            continue;
+        }
+
+        if (!bIdleMode)
+        {
+            // Tick the world.
+            Context->World()->Tick(DeltaSeconds );
+        }
+    }
+}
+
+void Engine::LoadConfig()
+{
 }
 
 double Engine::CorrectNegativeTimeDelta(double DeltaRealTime)
@@ -69,7 +94,7 @@ void Engine::UpdateTimeAndHandleMaxTickRate()
 WorldContext& Engine::CreateNewWorldContext()
 {
     WorldContext* NewWorldContext = new WorldContext();
-    WorldList.emplace_back(NewWorldContext);
+    m_worldList.emplace_back(NewWorldContext);
 
     return *NewWorldContext;
 }
