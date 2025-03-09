@@ -7,6 +7,7 @@
 #include "Engine/Runtime/Core/Logging/LogMacros.h"
 #include "Engine/Runtime/Engine/Classes/World/World.h"
 #include "Engine/Runtime/Core/Misc/App.h"
+#include "Subsystem/EngineSubsystemCollection.hpp"
 
 
 class GameInstance;
@@ -42,6 +43,9 @@ public:
 protected:
     std::vector<std::shared_ptr<WorldContext>> m_worldList;
     std::shared_ptr<GameInstance> m_gameInstance;
+
+private:
+    EngineSubsystemCollection m_engineSubsystemCollection;
 
 public:
     void Init(EngineLoop* InLoop);

@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.29)
 project(cpp-playground)
 
+include(FetchContent)
+FetchContent_Declare(
+        json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG v3.11.2
+)
+FetchContent_MakeAvailable(json)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set(CMAKE_CXX_STANDARD 20)
@@ -43,4 +51,15 @@ add_executable(
         Engine/Runtime/Launch/Launch.h
         Engine/Runtime/Engine/Classes/GameInstance.cpp
         Engine/Runtime/Engine/Classes/GameInstance.h
+        Engine/Runtime/Core/Misc/Path.cpp
+        Engine/Runtime/Core/Misc/Path.h
+        Engine/Runtime/Engine/Subsystem/Base/SubsystemBase.cpp
+        Engine/Runtime/Engine/Subsystem/Base/SubsystemBase.h
+        Engine/Runtime/Engine/Subsystem/Base/SubsystemCollection.hpp
+        Engine/Runtime/Engine/Subsystem/EngineSubsystemCollection.hpp
+        Engine/Runtime/Engine/Subsystem/Engine/EngineConfigSubsystem.cpp
+        Engine/Runtime/Engine/Subsystem/Engine/EngineConfigSubsystem.h
+        Engine/Runtime/Engine/Subsystem/Base/ISubsystemCollection.hpp
 )
+
+target_link_libraries(cpp-playground PRIVATE nlohmann_json::nlohmann_json)

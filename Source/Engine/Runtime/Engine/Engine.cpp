@@ -2,6 +2,7 @@
 
 #include "Engine.h"
 
+#include <fstream>
 #include <thread>
 
 #include "Classes/GameInstance.h"
@@ -14,8 +15,7 @@ void Engine::Init(EngineLoop* InLoop)
 {
     EngineLoopPtr = InLoop;
 
-    LoadConfig();
-    LoadConfig();
+    m_engineSubsystemCollection.Initialize();
 
     // WorldContext &InitialWorldContext = CreateNewWorldContext();
     // InitialWorldContext.SetCurrentWorld(World::CreateWorld());
@@ -46,10 +46,6 @@ void Engine::Tick(float DeltaSeconds, bool bIdleMode)
             Context->World()->Tick(DeltaSeconds );
         }
     }
-}
-
-void Engine::LoadConfig()
-{
 }
 
 double Engine::CorrectNegativeTimeDelta(double DeltaRealTime)

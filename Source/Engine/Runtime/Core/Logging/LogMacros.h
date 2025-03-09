@@ -14,3 +14,6 @@ LOG("Warning", format, ##__VA_ARGS__)
 
 #define LOG_I(format, ...) \
 LOG("INFO", format, ##__VA_ARGS__)
+
+#define LOG_E(format, ...) \
+LOG("ERROR", format, ##__VA_ARGS__)
