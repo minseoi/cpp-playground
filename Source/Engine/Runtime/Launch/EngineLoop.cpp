@@ -24,7 +24,7 @@ void EngineLoop::Tick()
     GEngine->UpdateTimeAndHandleMaxTickRate();
 
     {
-        bool bIdleMode;
+        bool bIdleMode = false;
         // main game engine tick
         GEngine->Tick(App::GetDeltaTime(), bIdleMode);
     }

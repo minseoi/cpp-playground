@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <thread>
+#include <algorithm>
 
 #include "Classes/GameInstance.h"
 #include "Engine/Runtime/Core/GenericPlatform/GenericPlatformTime.h"
