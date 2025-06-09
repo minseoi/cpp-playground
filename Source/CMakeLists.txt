@@ -28,8 +28,8 @@ add_executable(
         Network/SendFilter/Filter/PacketSendFilterDoOnce.h
         Network/SendFilter/Filter/PacketSendFilterCooldown.cpp
         Network/SendFilter/Filter/PacketSendFilterCooldown.h
-        Network/SendFilter/PakcetSendFilterManager.cpp
-        Network/SendFilter/PakcetSendFilterManager.h
+        Network/SendFilter/PacketSendFilterManager.cpp
+        Network/SendFilter/PacketSendFilterManager.h
         Log/LogDefinition.h
         Network/Packet/PacketDefinition.h
 
