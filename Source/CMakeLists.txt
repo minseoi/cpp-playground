@@ -39,6 +39,8 @@ add_executable(
         Engine/Runtime/Launch/EngineLoop.cpp
         Engine/Runtime/Launch/EngineLoop.h
         Engine/Runtime/Launch/Launch.cpp
+        Engine/Runtime/Core/Console/CommandRegistry.cpp
+        Engine/Runtime/Core/Console/CommandRegistry.h
         Engine/Runtime/Engine/Engine.cpp
         Engine/Runtime/Engine/Engine.h
         Engine/Runtime/Core/Logging/LogMacros.h
