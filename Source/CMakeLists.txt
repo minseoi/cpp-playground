@@ -63,3 +63,12 @@ add_executable(
 )
 
 target_link_libraries(cpp-playground PRIVATE nlohmann_json::nlohmann_json)
+
+# tests
+enable_testing()
+add_executable(
+        math_tests
+        ../tests/test_math.cpp
+        Math/Math.cpp
+)
+add_test(NAME math_tests COMMAND math_tests)
